@@ -1,0 +1,5 @@
+deploy.yaml
+.*
+Dockerfile
+LICENSE
+*.md
