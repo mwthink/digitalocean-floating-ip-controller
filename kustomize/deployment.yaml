@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: floating-ip-controller
+spec:
+  replicas: 1
+  template:
+    spec:
+      securityContext:
+        runAsUser: 1000
+      serviceAccountName: floating-ip-controller
+      containers:
+      - name: floating-ip-controller
+        image: floating-ip-controller
+        env:
+        - name: FLOATING_IP
+          value: "0.0.0.0"
+        - name: DIGITALOCEAN_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: digitalocean-token
+              key: token

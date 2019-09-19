@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: floating-ip-controller
+  name: floating-ip-controller
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: floating-ip-controller
+  name: floating-ip-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: floating-ip-controller
+  name: floating-ip-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: floating-ip-controller
+subjects:
+- kind: ServiceAccount
+  name: floating-ip-controller
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: floating-ip-controller
+  name: floating-ip-controller
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: floating-ip-controller
+  template:
+    metadata:
+      labels:
+        app: floating-ip-controller
+    spec:
+      containers:
+      - env:
+        - name: FLOATING_IP
+          value: 0.0.0.0
+        - name: DIGITALOCEAN_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: digitalocean-token
+        image: mwthink/digitalocean-floatingip-controller:v0.1.1
+        name: floating-ip-controller
+      securityContext:
+        runAsUser: 1000
+      serviceAccountName: floating-ip-controller

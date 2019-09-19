@@ -1,0 +1,14 @@
+namespace: kube-system
+
+commonLabels:
+  app: floating-ip-controller
+
+resources:
+- serviceaccount.yaml
+- rbac.yaml
+- deployment.yaml
+
+images:
+- name: floating-ip-controller
+  newName: mwthink/digitalocean-floatingip-controller
+  newTag: v0.1.1
