@@ -1,7 +1,6 @@
 #!/bin/sh
 # Requirements = curl, jq
 # Must set ${DIGITALOCEAN_TOKEN} and ${FLOATING_IP}
-set -e
 
 K8S_CURL_ARGS="--cacert /run/secrets/kubernetes.io/serviceaccount/ca.crt"
 KUBE_API_ENDPOINT="${KUBE_API_ENDPOINT:-"https://kubernetes.default.svc:443"}"
@@ -44,10 +43,10 @@ function get_current_droplet_id(){
 function assign_floating_ip(){
   IP="${1}"
   DROPLET_ID="${2}"
-  curl -sX POST -H "Content-Type: application/json" \
+  curl -O /dev/null -sX POST -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${DIGITALOCEAN_TOKEN}" \
     -d '{"type":"assign","droplet_id":'${DROPLET_ID}'}' \
-    "https://api.digitalocean.com/v2/floating_ips/${IP}/actions" -O /dev/null
+    "https://api.digitalocean.com/v2/floating_ips/${IP}/actions"
 }
 
 function run_main(){
