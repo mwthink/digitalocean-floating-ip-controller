@@ -1,0 +1,21 @@
+# ip: "x.x.x.x"
+# token: "..."
+
+replicaCount: 1
+
+image:
+  repository: mwthink/digitalocean-floatingip-controller
+  tag: v0.1.1
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

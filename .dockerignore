@@ -3,3 +3,4 @@ deploy.yaml
 Dockerfile
 LICENSE
 *.md
+chart/
