@@ -10,5 +10,5 @@ resources:
 
 images:
 - name: floating-ip-controller
-  newName: mwthink/digitalocean-floatingip-controller
-  newTag: v0.1.1
+  newName: mwthink/digitalocean-floating-ip-controller
+  newTag: v0.1.2
