@@ -63,7 +63,7 @@ spec:
             secretKeyRef:
               key: token
               name: digitalocean-token
-        image: mwthink/digitalocean-floating-ip-controller:v0.1.2
+        image: mwthink/digitalocean-floating-ip-controller:v0.1.3
         name: floating-ip-controller
       securityContext:
         runAsUser: 1000
