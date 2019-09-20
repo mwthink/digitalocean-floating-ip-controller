@@ -16,11 +16,15 @@ cluster node. The lifecycle of the application is:
 4. Sleep for a time, then repeat
 
 ## Configuration
-You must provide the following as *environment variables*:
+You **must** provide the following as *environment variables*:
 - `DIGITALOCEAN_TOKEN`
   - DigitalOcean API token
 - `FLOATING_IP`
   - Floating IP address that this controller manages
+
+You _can_ provide the following as *environment variables*:
+- `NODE_SELECTOR`
+  - Value for `labelSelector` on the node query
 
 ## Deploy
 You can customize the `deploy.yaml` file then `kubectl apply` it to

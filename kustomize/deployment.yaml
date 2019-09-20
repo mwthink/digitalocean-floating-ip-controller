@@ -13,6 +13,8 @@ spec:
       - name: floating-ip-controller
         image: floating-ip-controller
         env:
+        - name: NODE_SELECTOR
+          value: ""
         - name: FLOATING_IP
           value: "0.0.0.0"
         - name: DIGITALOCEAN_TOKEN
