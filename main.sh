@@ -5,11 +5,10 @@
 K8S_CURL_ARGS="--cacert /run/secrets/kubernetes.io/serviceaccount/ca.crt"
 KUBE_API_ENDPOINT="${KUBE_API_ENDPOINT:-"https://kubernetes.default.svc:443"}"
 SLEEP_TIME="${SLEEP_TIME:-"30"}"
-NODE_SELECTOR="${NODE_SELECTOR}"
 
-NODE_SELECTOR="?labelSelector="
+LABEL_SELECTOR=""
 if [[ ! -z "${NODE_SELECTOR}" ]]; then
-  NODE_SELECTOR="labelSelector=${NODE_SELECTOR}"
+  LABEL_SELECTOR="?labelSelector=${NODE_SELECTOR}"
 fi
 
 if [[ -z "${DIGITALOCEAN_TOKEN}" ]]; then
@@ -32,7 +31,7 @@ function get_node_list(){
   K8S_TOKEN="$(cat /run/secrets/kubernetes.io/serviceaccount/token)"
   curl -s ${K8S_CURL_ARGS} \
     --header "Authorization: Bearer ${K8S_TOKEN}" \
-    "${KUBE_API_ENDPOINT}/api/v1/nodes?${NODE_SELECTOR}" \
+    "${KUBE_API_ENDPOINT}/api/v1/nodes${LABEL_SELECTOR}" \
   | jq -cr
 }
 
