@@ -54,6 +54,40 @@ function assign_floating_ip(){
     "https://api.digitalocean.com/v2/floating_ips/${IP}/actions"
 }
 
+# Gets a droplet name from its id
+# Usage: get_droplet_name <dropletId>
+function get_droplet_name(){
+  DROPLET_ID="${1}"
+  get_node_list | jq -r '.items[] | select(.metadata.annotations."csi.volume.kubernetes.io/nodeid" | fromjson | ."dobs.csi.digitalocean.com" == "'${DROPLET_ID}'") | .metadata.name'
+}
+
+# Sets a label on a node
+# Usage: set_node_label <dropletId> <labelKey> <labelValue>
+function set_node_label(){
+  DROPLET_ID="${1}"
+  KEY="${2}"
+  VALUE="${3}"
+  DROPLET_NAME=$(get_droplet_name ${DROPLET_ID})
+  K8S_TOKEN="$(cat /run/secrets/kubernetes.io/serviceaccount/token)"
+  curl -O /dev/null -sX PATCH ${K8S_CURL_ARGS} -H "Content-Type: application/json-patch+json" \
+    --header "Authorization: Bearer ${K8S_TOKEN}" \
+    "${KUBE_API_ENDPOINT}/api/v1/nodes/${DROPLET_NAME}" \
+    --data '[{"op": "add", "path": "/metadata/labels/'${KEY}'", "value": "'${VALUE}'"}]'
+}
+
+# Deletes a label from a node
+# Usage: delete_node_label <dropletId> <labelKey>
+function remove_node_label() {
+  DROPLET_ID="${1}"
+  KEY="${2}"
+  DROPLET_NAME=$(get_droplet_name ${DROPLET_ID})
+  K8S_TOKEN="$(cat /run/secrets/kubernetes.io/serviceaccount/token)"
+  curl -O /dev/null -sX PATCH ${K8S_CURL_ARGS} -H "Content-Type: application/json-patch+json" \
+    --header "Authorization: Bearer ${K8S_TOKEN}" \
+    "${KUBE_API_ENDPOINT}/api/v1/nodes/${DROPLET_NAME}" \
+    --data '[{"op": "remove", "path": "/metadata/labels/'${KEY}'"}]'
+}
+
 function run_main(){
   ASSIGNED_TO=$(get_current_droplet_id)
   DROPLET=$(get_node_list | jq '.items[0]' | get_node_droplet_id)
@@ -64,8 +98,10 @@ function run_main(){
       echo "Attaching IP to droplet ${DROPLET}"
     else
       echo "Moving IP from droplet ${ASSIGNED_TO} to droplet ${DROPLET}"
+      remove_node_label $DROPLET "floating_ip"
     fi
     assign_floating_ip ${FLOATING_IP} ${DROPLET}
+    set_node_label $DROPLET "floating_ip" "${FLOATING_IP}"
   fi
 }
 
